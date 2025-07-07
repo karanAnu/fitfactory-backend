@@ -14,11 +14,13 @@ import contactRoutes from "./routes/contactRoute.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js"; // 🆕 User/subscription routes
 
-// ✅ Allowed frontend origins
+// ✅ Allowed frontend origins (localhost + vercel)
 const allowedOrigins = [
-  "http://localhost:5173",   // React (Vite)
-  "http://127.0.0.1:5500",   // VS Code Live Server (HTML)
-  "http://localhost:5500",   // Some Live Server configs
+  "http://localhost:5173",                       // React (Vite)
+  "http://127.0.0.1:5500",                       // Live Server (HTML)
+  "http://localhost:5500",
+  "https://fitfactory-frontend.vercel.app",     // ✅ Vercel - User Website
+  "https://fitfactory-admin.vercel.app",        // ✅ Vercel - Admin Panel
 ];
 
 // ✅ CORS setup
