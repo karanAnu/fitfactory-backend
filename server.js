@@ -3,42 +3,53 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 
-// ✅ Load env variables
+// ✅ Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS setup (fixed for Vercel)
+// ✅ Allowed frontend origins
+const allowedOrigins = [
+  "https://fitfactory-frontend.vercel.app",
+  "https://fitfactory-admin.vercel.app",
+  "http://localhost:5173", // local dev
+];
+
+// ✅ Correct CORS setup with preflight and credentials
 const corsOptions = {
-  origin: [
-    "https://fitfactory-frontend.vercel.app",  // ✅ Vercel - User Website
-    "https://fitfactory-admin.vercel.app",     // ✅ Vercel - Admin Panel
-    "http://localhost:5173",                   // ✅ Local dev
-  ],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
+
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // ✅ Important for preflight requests
 
 // ✅ Middleware
-app.use(express.json()); // ✅ Parse JSON
+app.use(express.json());
 
 // ✅ Route Imports
 import contactRoutes from "./routes/contactRoute.js";
 import authRoutes from "./routes/authRoutes.js";
-import userRoutes from "./routes/userRoutes.js"; // 🆕 User/subscription routes
+import userRoutes from "./routes/userRoutes.js";
 
 // ✅ API Routes
 app.use("/api/contact", contactRoutes);
-app.use("/api/auth", authRoutes);       // 🔐 Auth (signup/login/otp)
-app.use("/api/users", userRoutes);      // 👤 User routes (subscription, profile etc.)
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
-// ✅ Test Route
+// ✅ Default route
 app.get("/", (req, res) => {
   res.send("✅ FitFactory backend is live!");
 });
 
-// ✅ MongoDB + Start Server
+// ✅ Connect to MongoDB and start the server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -49,5 +60,5 @@ mongoose
   })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1); // Exit process on failure
+    process.exit(1);
   });
