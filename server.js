@@ -9,36 +9,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ✅ CORS setup (fixed for Vercel)
+const corsOptions = {
+  origin: [
+    "https://fitfactory-frontend.vercel.app",  // ✅ Vercel - User Website
+    "https://fitfactory-admin.vercel.app",     // ✅ Vercel - Admin Panel
+    "http://localhost:5173",                   // ✅ Local dev
+  ],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+// ✅ Middleware
+app.use(express.json()); // ✅ Parse JSON
+
 // ✅ Route Imports
 import contactRoutes from "./routes/contactRoute.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js"; // 🆕 User/subscription routes
-
-// ✅ Allowed frontend origins (localhost + vercel)
-const allowedOrigins = [
-  "http://localhost:5173",                       // React (Vite)
-  "http://127.0.0.1:5500",                       // Live Server (HTML)
-  "http://localhost:5500",
-  "https://fitfactory-frontend.vercel.app",     // ✅ Vercel - User Website
-  "https://fitfactory-admin.vercel.app",        // ✅ Vercel - Admin Panel
-];
-
-// ✅ CORS setup
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("❌ Not allowed by CORS: " + origin));
-      }
-    },
-    credentials: true,
-  })
-);
-
-// ✅ Middleware
-app.use(express.json()); // ✅ Parse JSON
 
 // ✅ API Routes
 app.use("/api/contact", contactRoutes);
